@@ -75,6 +75,23 @@ fm_scan_directory(const int fd, const struct stat *const restrict sb, const char
 		(void) snprintf(entpath, sizeof entpath, "%s%s%s",
 		                abspath, ((strcmp(abspath, "/") != 0) ? "/" : ""), ede->d_name);
 
+		if (fstatat(fd, ede->d_name, &esb, AT_SYMLINK_NOFOLLOW) < 0)
+		{
+			(void) fm_print_message("%s: while scanning '%s': fstatat(2): %s\n",
+			                        argvzero, entpath, strerror(errno));
+			return false;
+		}
+
+		if (esb.st_dev != sb->st_dev)
+			// Not on the same filesystem
+			continue;
+
+		if (! (((esb.st_mode & S_IFMT) == S_IFDIR) || ((esb.st_mode & S_IFMT) == S_IFREG)))
+			// Not a file or directory
+			continue;
+
+		(void) memset(&esb, 0x00, sizeof esb);
+
 		if ((efd = openat(fd, ede->d_name, O_NOCTTY | O_RDONLY, 0)) < 0)
 		{
 			(void) fm_print_message("%s: while scanning '%s': openat(2): %s\n",
