@@ -57,7 +57,7 @@ fm_scan_extents(const int fd, const struct stat *const restrict sb, const char *
 			                        argvzero, abspath, strerror(errno));
 			return false;
 		}
-		if (fmh_extent_count < fmh.fm_mapped_extents)
+		if (fmh_extent_count <= fmh.fm_mapped_extents)
 		{
 			fmh_extent_count = (((fmh.fm_mapped_extents + 256U) % 256U) + 256U);
 			fmh_extent_size = ((sizeof *fm) + (fmh_extent_count * sizeof(struct fiemap_extent)));
