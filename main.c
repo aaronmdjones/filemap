@@ -64,7 +64,7 @@ main(int argc, char *argv[])
 		case FM_OPTPARSE_CONTINUE:
 			break;
 	}
-	if ((fd = open(argv[optind], O_NOCTTY | O_RDONLY, 0)) < 0)
+	if ((fd = open(argv[optind], O_NOCTTY | O_RDONLY | O_NOFOLLOW, 0)) < 0)
 	{
 		(void) fprintf(stderr, "%s: while scanning '%s': open(2): %s\n",
 		                       argvzero, argv[optind], strerror(errno));
