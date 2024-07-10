@@ -125,8 +125,6 @@ fm_scan_directory(const int fd, const struct stat *const restrict sb, const char
 				// This function prints messages on error
 				return false;
 
-			fm_file_count++;
-
 			// The function called above will close the fd
 			continue;
 		}
@@ -140,8 +138,6 @@ fm_scan_directory(const int fd, const struct stat *const restrict sb, const char
 		if (! fm_scan_extents(fd, sb, abspath))
 			// This function prints messages on error
 			return false;
-
-		fm_dir_count++;
 	}
 
 	// This will also close the fd

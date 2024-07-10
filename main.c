@@ -86,16 +86,12 @@ main(int argc, char *argv[])
 		if (! fm_scan_directory(fd, &sb, argv[optind]))
 			// This function prints messages on error
 			return EXIT_FAILURE;
-
-		fm_dir_count++;
 	}
 	else if ((sb.st_mode & S_IFMT) == S_IFREG)
 	{
 		if (! fm_scan_extents(fd, &sb, argv[optind]))
 			// This function prints messages on error
 			return EXIT_FAILURE;
-
-		fm_file_count++;
 	}
 	else
 	{

@@ -170,6 +170,11 @@ fm_scan_extents(const int fd, const struct stat *const restrict sb, const char *
 		return false;
 	}
 
+	if ((sb->st_mode & S_IFMT) == S_IFDIR)
+		fm_dir_count++;
+	else
+		fm_file_count++;
+
 	// Append a slash to the end of directory names, but only if the directory is not /
 	(void) snprintf(fn->name, sizeof fn->name, "%s%s", abspath,
 	                (((sb->st_mode & S_IFMT) == S_IFDIR && strcmp(abspath, "/") != 0) ? "/" : ""));
