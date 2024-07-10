@@ -92,7 +92,7 @@ fm_scan_directory(const int fd, const struct stat *const restrict sb, const char
 
 		(void) memset(&esb, 0x00, sizeof esb);
 
-		if ((efd = openat(fd, ede->d_name, O_NOCTTY | O_RDONLY, 0)) < 0)
+		if ((efd = openat(fd, ede->d_name, O_NOCTTY | O_RDONLY | O_NOFOLLOW, 0)) < 0)
 		{
 			(void) fm_print_message("%s: while scanning '%s': openat(2): %s\n",
 			                        argvzero, entpath, strerror(errno));
