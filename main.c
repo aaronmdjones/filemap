@@ -102,6 +102,9 @@ main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
+	if (! fm_run_quietly)
+		(void) fm_print_message("%s: sorting results ...", argvzero);
+
 	HASH_SORT(fm_extents, fm_sortby_extent_cb);
 
 	(void) fm_print_results();
