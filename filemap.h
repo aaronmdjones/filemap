@@ -104,6 +104,7 @@ extern enum fm_sort_direction fm_sort_direction;
 extern enum fm_sort_method fm_sort_method;
 extern bool fm_scan_directories;
 extern bool fm_fragmented_only;
+extern bool fm_run_quietly;
 extern bool fm_skip_preamble;
 extern bool fm_sync_files;
 extern bool fm_readable_offsets;

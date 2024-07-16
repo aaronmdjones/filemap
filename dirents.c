@@ -27,7 +27,8 @@ fm_scan_directory(const int fd, const struct stat *const restrict sb, const char
 {
 	DIR *dp;
 
-	(void) fm_print_message("%s: scanning %s ...", argvzero, abspath);
+	if (! fm_run_quietly)
+		(void) fm_print_message("%s: scanning %s ...", argvzero, abspath);
 
 	if (fm_sync_files && fsync(fd) < 0)
 	{
@@ -49,7 +50,8 @@ fm_scan_directory(const int fd, const struct stat *const restrict sb, const char
 		struct stat esb;
 		int efd;
 
-		(void) fm_print_message("%s: walking %s ...", argvzero, abspath);
+		if (! fm_run_quietly)
+			(void) fm_print_message("%s: walking %s ...", argvzero, abspath);
 
 		errno = 0;
 

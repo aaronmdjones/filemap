@@ -19,7 +19,7 @@ fm_print_usage(void)
 	(void) fprintf(stderr, "\n"
 	    "  Usage: filemap -h\n"
 	    "  Usage: filemap [-A | -D] [-O | -L | -C | -H | -N | -S | -F]\n"
-	    "                 [-d -f -x -y] [[-o -l -s] | -r] <path>\n"
+	    "                 [-d -f -q -x -y] [[-o -l -s] | -r] <path>\n"
 	    "\n"
 	    "    -h / --help               Show this help message and exit\n"
 	    "\n"
@@ -37,6 +37,7 @@ fm_print_usage(void)
 	    "    -d / --scan-directories   Scan the extents that belong to\n"
 	    "                              directories as well as regular files\n"
 	    "    -f / --fragmented-only    Print fragmented files only\n"
+	    "    -q / --quiet              Don't print the action being performed\n"
 	    "    -x / --skip-preamble      Skip the informational message lines\n"
 	    "                              printed before the table of extents\n"
 	    "    -y / --sync-files         Invoke fsync(2) on everything being\n"
@@ -87,6 +88,7 @@ fm_parse_options(int argc, char *argv[])
 		{   "order-filename", 0, NULL, 'F' },
 		{ "scan-directories", 0, NULL, 'd' },
 		{  "fragmented-only", 0, NULL, 'f' },
+		{            "quiet", 0, NULL, 'q' },
 		{    "skip-preamble", 0, NULL, 'x' },
 		{       "sync-files", 0, NULL, 'y' },
 		{ "readable-offsets", 0, NULL, 'o' },
@@ -96,7 +98,7 @@ fm_parse_options(int argc, char *argv[])
 		{               NULL, 0, NULL,  0  },
 	};
 
-	static const char shortopts[] = "hADOLCHNSFdfxyolsr";
+	static const char shortopts[] = "hADOLCHNSFdfqxyolsr";
 
 	argvzero = argv[0];
 
@@ -155,6 +157,10 @@ fm_parse_options(int argc, char *argv[])
 
 			case 'f':
 				fm_fragmented_only = true;
+				break;
+
+			case 'q':
+				fm_run_quietly = true;
 				break;
 
 			case 'x':

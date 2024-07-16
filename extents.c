@@ -37,7 +37,8 @@ fm_scan_extents(const int fd, const struct stat *const restrict sb, const char *
 	const uint64_t inum = (uint64_t) sb->st_ino;
 	struct fm_inode *fi = NULL;
 
-	(void) fm_print_message("%s: mapping %s ...", argvzero, abspath);
+	if (! fm_run_quietly)
+		(void) fm_print_message("%s: mapping %s ...", argvzero, abspath);
 
 	HASH_FIND(hh, fm_inodes, &inum, sizeof inum, fi);
 
