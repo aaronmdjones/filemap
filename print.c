@@ -302,7 +302,7 @@ results:
 				              fm_readable_size(FM_READABLE_LENGTH, extlen),
 				              extpos, extflags, extent->inode->inum, inoflags,
 				              fm_readable_size(FM_READABLE_SIZE, fsize),
-				              extent->inode->names->name);
+				              fname->name);
 			}
 			else if (! (extent->inode->flags & FM_IFLAGS_PRINTED))
 			{
