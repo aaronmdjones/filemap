@@ -268,8 +268,8 @@ results:
 
 	(void) printf("\n");
 
-	(void) printf("%20s %20s %12s %12s %12s %12s %20s    %s\n", "Physical Offset", "Length",
-	              "Extent", "Extent Flags", "Inode", "Inode Flags", "File Size", "File Names");
+	(void) printf("%20s %20s %12s %12s %12s %12s %20s    %s\n", "Extent Offset", "Extent Length",
+	              "Extent Count", "Extent Flags", "Inode Number", "Inode Flags", "File Size", "File Name(s)");
 
 	(void) printf("-------------------- -------------------- ------------ ------------ "
 	              "------------ ------------ --------------------    ------------\n\n");
