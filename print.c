@@ -310,15 +310,13 @@ results:
 				 * but only if we have not yet done so for this inode already
 				 */
 				(void) printf("%20s %20s %12s %12s %12s %12s %20s    %s\n",
-				              "----", "----", "----", "----", "----", "----", "----",
-				              fname->name);
+				              "-----", " ", " ", " ", " ", " ", " ", fname->name);
 			}
 			else
 			{
 				// We have already printed other file names for this inode, skip doing so
 				(void) printf("%20s %20s %12s %12s %12s %12s %20s    %s\n",
-				              "++++", "++++", "++++", "++++", "++++", "++++", "++++",
-				              "++++");
+				              "+++++", " ", " ", " ", " ", " ", " ", "+++++");
 				break;
 			}
 		}
