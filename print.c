@@ -25,6 +25,7 @@ fm_readable_size(const enum fm_readable_which which, const uint64_t insize)
 	static char result_offset[128U];
 	static char result_length[128U];
 	static char result_size[128U];
+	static char result_gap[128U];
 	bool do_readable = false;
 	char *result = NULL;
 
@@ -43,6 +44,11 @@ fm_readable_size(const enum fm_readable_which which, const uint64_t insize)
 		case FM_READABLE_SIZE:
 			do_readable = fm_readable_sizes;
 			result = result_size;
+			break;
+
+		case FM_READABLE_GAP:
+			do_readable = fm_readable_gaps;
+			result = result_gap;
 			break;
 	}
 
@@ -185,6 +191,8 @@ fm_print_results(void)
 	const struct fm_name *fname;
 	uint64_t fragged_extents = 0U;
 	uint64_t fragged_inodes = 0U;
+	uint64_t prev_extoff = 0U;
+	uint64_t prev_extlen = 0U;
 	struct fm_extent *extent;
 	struct fm_extent *etmp;
 	struct fm_inode *inode;
@@ -279,6 +287,14 @@ results:
 		if (fm_fragmented_only && ! (extent->inode->flags & FM_IFLAGS_FRAGMENTED))
 			continue;
 
+		if (fm_print_gaps && prev_extoff && (prev_extoff + prev_extlen) < extent->off)
+		{
+			const uint64_t gap = (extent->off - (prev_extoff + prev_extlen));
+
+			(void) printf("%20s %-20s %12s %12s %12s %12s %20s\n",
+			              " ", fm_readable_size(FM_READABLE_GAP, gap), " ", " ", " ", " ", " ");
+		}
+
 		DL_FOREACH(extent->inode->names, fname)
 		{
 			if (fname == extent->inode->names)
@@ -322,6 +338,9 @@ results:
 		}
 
 		extent->inode->flags |= FM_IFLAGS_PRINTED;
+
+		prev_extoff = extent->off;
+		prev_extlen = extent->len;
 
 		(void) fflush(stdout);
 	}

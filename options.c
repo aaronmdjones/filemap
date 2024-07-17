@@ -19,7 +19,7 @@ fm_print_usage(void)
 	(void) fprintf(stderr, "\n"
 	    "  Usage: filemap -h\n"
 	    "  Usage: filemap [-A | -D] [-O | -L | -C | -H | -N | -S | -F]\n"
-	    "                 [-d -f -q -x -y] [[-o -l -s] | -r] <path>\n"
+	    "                 [-d -f -g -q -x -y] [[-o -l -s -t] | -r] <path>\n"
 	    "\n"
 	    "    -h / --help               Show this help message and exit\n"
 	    "\n"
@@ -37,6 +37,9 @@ fm_print_usage(void)
 	    "    -d / --scan-directories   Scan the extents that belong to\n"
 	    "                              directories as well as regular files\n"
 	    "    -f / --fragmented-only    Print fragmented files only\n"
+	    "    -g / --print-gaps         Print the gaps between extents\n"
+	    "                              Needs --sort-ascending --order-offset\n"
+	    "                              Incompatible with --fragmented-only\n"
 	    "    -q / --quiet              Don't print the action being performed\n"
 	    "    -x / --skip-preamble      Skip the informational message lines\n"
 	    "                              printed before the table of extents\n"
@@ -46,8 +49,9 @@ fm_print_usage(void)
 	    "    -o / --readable-offsets   Print human-readable extent offsets\n"
 	    "    -l / --readable-lengths   Print human-readable extent lengths\n"
 	    "    -s / --readable-sizes     Print human-readable file sizes\n"
-	    "    -r / --readable-all       Short-hand for the above 3 options;\n"
-	    "                              implies '-o -l -s'\n"
+	    "    -t / --readable-gaps      Print human-readable extent gaps\n"
+	    "    -r / --readable-all       Short-hand for the above 4 options;\n"
+	    "                              implies '-o -l -s -t'\n"
 	    "\n"
 	    "  Notes:\n"
 	    "\n"
@@ -88,17 +92,19 @@ fm_parse_options(int argc, char *argv[])
 		{   "order-filename", 0, NULL, 'F' },
 		{ "scan-directories", 0, NULL, 'd' },
 		{  "fragmented-only", 0, NULL, 'f' },
+		{       "print-gaps", 0, NULL, 'g' },
 		{            "quiet", 0, NULL, 'q' },
 		{    "skip-preamble", 0, NULL, 'x' },
 		{       "sync-files", 0, NULL, 'y' },
 		{ "readable-offsets", 0, NULL, 'o' },
 		{ "readable-lengths", 0, NULL, 'l' },
 		{   "readable-sizes", 0, NULL, 's' },
+		{    "readable-gaps", 0, NULL, 't' },
 		{     "readable-all", 0, NULL, 'r' },
 		{               NULL, 0, NULL,  0  },
 	};
 
-	static const char shortopts[] = "hADOLCHNSFdfqxyolsr";
+	static const char shortopts[] = "hADOLCHNSFdfgqxyolstr";
 
 	argvzero = argv[0];
 
@@ -159,6 +165,10 @@ fm_parse_options(int argc, char *argv[])
 				fm_fragmented_only = true;
 				break;
 
+			case 'g':
+				fm_print_gaps = true;
+				break;
+
 			case 'q':
 				fm_run_quietly = true;
 				break;
@@ -183,10 +193,15 @@ fm_parse_options(int argc, char *argv[])
 				fm_readable_sizes = true;
 				break;
 
+			case 't':
+				fm_readable_gaps = true;
+				break;
+
 			case 'r':
 				fm_readable_offsets = true;
 				fm_readable_lengths = true;
 				fm_readable_sizes = true;
+				fm_readable_gaps = true;
 				break;
 
 			default:
@@ -195,6 +210,21 @@ fm_parse_options(int argc, char *argv[])
 		}
 	}
 
+	if (fm_print_gaps && fm_sort_direction != FM_SORTDIR_ASCENDING)
+	{
+		(void) fm_print_usage();
+		return FM_OPTPARSE_EXIT_FAILURE;
+	}
+	if (fm_print_gaps && fm_sort_method != FM_SORTMETH_EXTENT_OFFSET)
+	{
+		(void) fm_print_usage();
+		return FM_OPTPARSE_EXIT_FAILURE;
+	}
+	if (fm_print_gaps && fm_fragmented_only)
+	{
+		(void) fm_print_usage();
+		return FM_OPTPARSE_EXIT_FAILURE;
+	}
 	if (optind >= argc)
 	{
 		(void) fm_print_usage();

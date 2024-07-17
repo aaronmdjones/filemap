@@ -60,6 +60,7 @@ enum fm_readable_which
 	FM_READABLE_OFFSET              = 1,
 	FM_READABLE_LENGTH              = 2,
 	FM_READABLE_SIZE                = 3,
+	FM_READABLE_GAP                 = 4,
 };
 
 struct fm_extent;
@@ -104,12 +105,14 @@ extern enum fm_sort_direction fm_sort_direction;
 extern enum fm_sort_method fm_sort_method;
 extern bool fm_scan_directories;
 extern bool fm_fragmented_only;
+extern bool fm_print_gaps;
 extern bool fm_run_quietly;
 extern bool fm_skip_preamble;
 extern bool fm_sync_files;
 extern bool fm_readable_offsets;
 extern bool fm_readable_lengths;
 extern bool fm_readable_sizes;
+extern bool fm_readable_gaps;
 
 // Global data structures
 // Located in main.c

@@ -24,12 +24,14 @@ enum fm_sort_direction fm_sort_direction = FM_SORTDIR_ASCENDING;
 enum fm_sort_method fm_sort_method = FM_SORTMETH_EXTENT_OFFSET;
 bool fm_scan_directories = false;
 bool fm_fragmented_only = false;
+bool fm_print_gaps = false;
 bool fm_run_quietly = false;
 bool fm_skip_preamble = false;
 bool fm_sync_files = false;
 bool fm_readable_offsets = false;
 bool fm_readable_lengths = false;
 bool fm_readable_sizes = false;
+bool fm_readable_gaps = false;
 
 // Global data structures
 struct fm_extent *fm_extents = NULL;
