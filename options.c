@@ -19,45 +19,51 @@ fm_print_usage(void)
 	(void) fprintf(stderr, "\n"
 	    "  Usage: filemap -h\n"
 	    "  Usage: filemap [-A | -D] [-O | -L | -C | -H | -N | -S | -F]\n"
-	    "                 [-d -f -g -q -x -y] [[-o -l -s -t] | -r] <path>\n"
+	    "                 [-d [-f | -g] -q -x -y] [[-o -l -s -t] | -r]\n"
+	    "                 <path>\n"
 	    "\n"
-	    "    -h / --help               Show this help message and exit\n"
+	    "    -h / --help               Show this help message and exit.\n"
 	    "\n"
-	    "    -A / --sort-ascending     Display extents in ascending order\n"
-	    "    -D / --sort-descending    Display extents in descending order\n"
+	    "    -A / --sort-ascending     Display extents in ascending order.\n"
+	    "    -D / --sort-descending    Display extents in descending order.\n"
 	    "\n"
-	    "    -O / --order-offset       Order extents by physical offset\n"
-	    "    -L / --order-length       Order extents by physical length\n"
-	    "    -C / --order-count        Order extents by number of extents\n"
-	    "    -H / --order-links        Order extents by number of hardlinks\n"
-	    "    -N / --order-inum         Order extents by inode number\n"
-	    "    -S / --order-filesize     Order extents by file size\n"
-	    "    -F / --order-filename     Order extents by file name\n"
+	    "    -O / --order-offset       Order extents by physical offset.\n"
+	    "    -L / --order-length       Order extents by physical length.\n"
+	    "    -C / --order-count        Order extents by number of extents.\n"
+	    "    -H / --order-links        Order extents by number of hardlinks.\n"
+	    "    -N / --order-inum         Order extents by inode number.\n"
+	    "    -S / --order-filesize     Order extents by file size.\n"
+	    "    -F / --order-filename     Order extents by file name.\n"
 	    "\n"
 	    "    -d / --scan-directories   Scan the extents that belong to\n"
-	    "                              directories as well as regular files\n"
+	    "                              directories as well as regular files.\n"
 	    "\n"
-	    "    -f / --fragmented-only    Print fragmented files only\n"
+	    "    -f / --fragmented-only    Print fragmented files only.\n"
+	    "                              Incompatible with --print-gaps.\n"
 	    "\n"
-	    "    -g / --print-gaps         Print the gaps between extents\n"
-	    "                              Needs --sort-ascending --order-offset\n"
-	    "                              Incompatible with --fragmented-only\n"
+	    "    -g / --print-gaps         Print the gaps between extents.\n"
+	    "                              Incompatible with --fragmented-only.\n"
+	    "                              Implies:\n"
+	    "                                  --sort-ascending\n"
+	    "                                  --order-offset\n"
 	    "\n"
-	    "    -q / --quiet              Don't print the action being performed\n"
+	    "    -q / --quiet              Don't print the action being performed.\n"
 	    "\n"
 	    "    -x / --skip-preamble      Skip the informational message lines\n"
-	    "                              printed before the table of extents\n"
+	    "                              printed before the results.\n"
 	    "\n"
 	    "    -y / --sync-files         Invoke fsync(2) on everything being\n"
-	    "                              scanned before scanning it\n"
+	    "                              scanned before scanning it.\n"
 	    "\n"
-	    "    -o / --readable-offsets   Print human-readable extent offsets\n"
-	    "    -l / --readable-lengths   Print human-readable extent lengths\n"
-	    "    -s / --readable-sizes     Print human-readable file sizes\n"
-	    "    -t / --readable-gaps      Print human-readable extent gaps\n"
-	    "\n"
-	    "    -r / --readable-all       Short-hand for the above 4 options;\n"
-	    "                              implies '-o -l -s -t'\n"
+	    "    -o / --readable-offsets   Print human-readable extent offsets.\n"
+	    "    -l / --readable-lengths   Print human-readable extent lengths.\n"
+	    "    -s / --readable-sizes     Print human-readable file sizes.\n"
+	    "    -t / --readable-gaps      Print human-readable extent gaps.\n"
+	    "    -r / --readable-all       Implies:\n"
+	    "                                  --readable-offsets\n"
+	    "                                  --readable-lengths\n"
+	    "                                  --readable-sizes\n"
+	    "                                  --readable-gaps\n"
 	    "\n"
 	    "  Notes:\n"
 	    "\n"
@@ -216,20 +222,15 @@ fm_parse_options(int argc, char *argv[])
 		}
 	}
 
-	if (fm_print_gaps && fm_sort_direction != FM_SORTDIR_ASCENDING)
-	{
-		(void) fm_print_usage();
-		return FM_OPTPARSE_EXIT_FAILURE;
-	}
-	if (fm_print_gaps && fm_sort_method != FM_SORTMETH_EXTENT_OFFSET)
-	{
-		(void) fm_print_usage();
-		return FM_OPTPARSE_EXIT_FAILURE;
-	}
 	if (fm_print_gaps && fm_fragmented_only)
 	{
 		(void) fm_print_usage();
 		return FM_OPTPARSE_EXIT_FAILURE;
+	}
+	if (fm_print_gaps)
+	{
+		fm_sort_direction = FM_SORTDIR_ASCENDING;
+		fm_sort_method = FM_SORTMETH_EXTENT_OFFSET;
 	}
 	if (optind >= argc)
 	{
