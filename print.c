@@ -274,20 +274,24 @@ results:
 	if (fm_fragmented_only && ! fragged_inodes)
 		return;
 
-	(void) printf("\n");
+	if (! fm_names_only)
+	{
+		(void) printf("\n");
 
-	(void) printf("%20s %20s %12s %12s %12s %12s %20s    %s\n", "Extent Offset", "Extent Length",
-	              "Extent Count", "Extent Flags", "Inode Number", "Inode Flags", "File Size", "File Name(s)");
+		(void) printf("%20s %20s %12s %12s %12s %12s %20s    %s\n", "Extent Offset", "Extent Length",
+		              "Extent Count", "Extent Flags", "Inode Number", "Inode Flags", "File Size",
+		              "File Name(s)");
 
-	(void) printf("-------------------- -------------------- ------------ ------------ "
-	              "------------ ------------ --------------------    ------------\n\n");
+		(void) printf("-------------------- -------------------- ------------ ------------ "
+		              "------------ ------------ --------------------    ------------\n\n");
+	}
 
 	HASH_ITER(hh, fm_extents, extent, etmp)
 	{
 		if (fm_fragmented_only && ! (extent->inode->flags & FM_IFLAGS_FRAGMENTED))
 			continue;
 
-		if (fm_print_gaps && prev_extoff && (prev_extoff + prev_extlen) < extent->off)
+		if (fm_print_gaps && prev_extoff && (prev_extoff + prev_extlen) < extent->off && ! fm_names_only)
 		{
 			const uint64_t gap = (extent->off - (prev_extoff + prev_extlen));
 
@@ -297,6 +301,21 @@ results:
 
 		DL_FOREACH(extent->inode->names, fname)
 		{
+			if (fm_names_only)
+			{
+				if (! (extent->inode->flags & FM_IFLAGS_PRINTED))
+				{
+					(void) printf("%s", fname->name);
+
+					if (fm_names_zero)
+						(void) putchar('\0');
+					else
+						(void) putchar('\n');
+				}
+
+				continue;
+			}
+
 			if (fname == extent->inode->names)
 			{
 				const uint64_t extoff = ((fm_integral_blksz && ! fm_readable_offsets) ? \

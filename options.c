@@ -19,7 +19,7 @@ fm_print_usage(void)
 	(void) fprintf(stderr, "\n"
 	    "  Usage: filemap -h\n"
 	    "  Usage: filemap [-A | -D] [-O | -L | -C | -H | -N | -S | -F]\n"
-	    "                 [-d [-f | -g] -q -x -y] [[-o -l -s -t] | -r]\n"
+	    "                 [-d [[-f -n] | -g] -q -x -y -z] [[-o -l -s -t] | -r]\n"
 	    "                 <path>\n"
 	    "\n"
 	    "    -h / --help               Show this help message and exit.\n"
@@ -42,10 +42,20 @@ fm_print_usage(void)
 	    "                              Incompatible with --print-gaps.\n"
 	    "\n"
 	    "    -g / --print-gaps         Print the gaps between extents.\n"
-	    "                              Incompatible with --fragmented-only.\n"
+	    "                              Incompatible with:\n"
+	    "                                  --fragmented-only\n"
+	    "                                  --names-only\n"
 	    "                              Implies:\n"
 	    "                                  --sort-ascending\n"
 	    "                                  --order-offset\n"
+	    "\n"
+	    "    -n / --names-only         Print file names only; no other info.\n"
+	    "                              Incompatible with --print-gaps.\n"
+	    "                              Implies:\n"
+	    "                                  --sort-ascending\n"
+	    "                                  --order-filename\n"
+	    "                                  --quiet\n"
+	    "                                  --skip-preamble\n"
 	    "\n"
 	    "    -q / --quiet              Don't print the action being performed.\n"
 	    "\n"
@@ -54,6 +64,10 @@ fm_print_usage(void)
 	    "\n"
 	    "    -y / --sync-files         Invoke fsync(2) on everything being\n"
 	    "                              scanned before scanning it.\n"
+	    "\n"
+	    "    -z / --names-zero         Separate file names by a NUL instead\n"
+	    "                              of new line. Implies --names-only.\n"
+	    "                              Suitable for piping to 'xargs -0'.\n"
 	    "\n"
 	    "    -o / --readable-offsets   Print human-readable extent offsets.\n"
 	    "    -l / --readable-lengths   Print human-readable extent lengths.\n"
@@ -105,9 +119,11 @@ fm_parse_options(int argc, char *argv[])
 		{ "scan-directories", 0, NULL, 'd' },
 		{  "fragmented-only", 0, NULL, 'f' },
 		{       "print-gaps", 0, NULL, 'g' },
+		{       "names-only", 0, NULL, 'n' },
 		{            "quiet", 0, NULL, 'q' },
 		{    "skip-preamble", 0, NULL, 'x' },
 		{       "sync-files", 0, NULL, 'y' },
+		{       "names-zero", 0, NULL, 'z' },
 		{ "readable-offsets", 0, NULL, 'o' },
 		{ "readable-lengths", 0, NULL, 'l' },
 		{   "readable-sizes", 0, NULL, 's' },
@@ -116,7 +132,7 @@ fm_parse_options(int argc, char *argv[])
 		{               NULL, 0, NULL,  0  },
 	};
 
-	static const char shortopts[] = "hADOLCHNSFdfgqxyolstr";
+	static const char shortopts[] = "hADOLCHNSFdfgnqxyzolstr";
 
 	argvzero = argv[0];
 
@@ -181,6 +197,10 @@ fm_parse_options(int argc, char *argv[])
 				fm_print_gaps = true;
 				break;
 
+			case 'n':
+				fm_names_only = true;
+				break;
+
 			case 'q':
 				fm_run_quietly = true;
 				break;
@@ -191,6 +211,11 @@ fm_parse_options(int argc, char *argv[])
 
 			case 'y':
 				fm_sync_files = true;
+				break;
+
+			case 'z':
+				fm_names_only = true;
+				fm_names_zero = true;
 				break;
 
 			case 'o':
@@ -222,7 +247,7 @@ fm_parse_options(int argc, char *argv[])
 		}
 	}
 
-	if (fm_print_gaps && fm_fragmented_only)
+	if (fm_print_gaps && (fm_fragmented_only || fm_names_only))
 	{
 		(void) fm_print_usage();
 		return FM_OPTPARSE_EXIT_FAILURE;
@@ -231,6 +256,13 @@ fm_parse_options(int argc, char *argv[])
 	{
 		fm_sort_direction = FM_SORTDIR_ASCENDING;
 		fm_sort_method = FM_SORTMETH_EXTENT_OFFSET;
+	}
+	if (fm_names_only)
+	{
+		fm_sort_direction = FM_SORTDIR_ASCENDING;
+		fm_sort_method = FM_SORTMETH_FILENAME;
+		fm_run_quietly = true;
+		fm_skip_preamble = true;
 	}
 	if (optind >= argc)
 	{
